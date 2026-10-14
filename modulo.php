@@ -1,3 +1,1 @@
-﻿
-Módulo de autenticación
-
+﻿Módulo de autenticación
