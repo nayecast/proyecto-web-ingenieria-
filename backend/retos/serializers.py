@@ -1,6 +1,7 @@
+from django.utils import timezone
 from rest_framework import serializers
 
-from .models import Avance, Reto
+from .models import Avance, Reto, TareaSemanal
 
 
 class AvanceSerializer(serializers.ModelSerializer):
@@ -28,4 +29,30 @@ class RetoSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {'fecha_fin': 'La fecha de fin no puede ser anterior a la fecha de inicio.'}
             )
+        return datos
+
+
+class TareaSemanalSerializer(serializers.ModelSerializer):
+    reto_titulo = serializers.CharField(source='reto.titulo', read_only=True)
+
+    class Meta:
+        model = TareaSemanal
+        fields = [
+            'id', 'reto', 'reto_titulo', 'semana', 'fecha_inicio', 'fecha_fin',
+            'descripcion', 'porcentaje', 'actualizado',
+        ]
+        read_only_fields = ['reto', 'semana', 'fecha_inicio', 'fecha_fin', 'actualizado']
+
+    def validate(self, datos):
+        tarea = self.instance
+        hoy = timezone.localdate()
+        if tarea is not None:
+            if hoy > tarea.fecha_fin:
+                raise serializers.ValidationError(
+                    f'La semana {tarea.semana} ya está cerrada; no se puede modificar.'
+                )
+            if hoy < tarea.fecha_inicio:
+                raise serializers.ValidationError(
+                    f'La semana {tarea.semana} todavía no ha comenzado.'
+                )
         return datos

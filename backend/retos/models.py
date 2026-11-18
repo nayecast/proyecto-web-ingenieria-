@@ -43,3 +43,28 @@ class Avance(models.Model):
 
     def __str__(self):
         return f'{self.reto} - {self.fecha} ({self.porcentaje} %)'
+
+
+class TareaSemanal(models.Model):
+    reto = models.ForeignKey(Reto, on_delete=models.CASCADE, related_name='tareas')
+    semana = models.PositiveSmallIntegerField()
+    fecha_inicio = models.DateField()
+    fecha_fin = models.DateField()
+    descripcion = models.CharField(max_length=255, blank=True)
+    porcentaje = models.PositiveSmallIntegerField(
+        default=0, validators=[MinValueValidator(0), MaxValueValidator(100)]
+    )
+    actualizado = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['reto', 'semana']
+        verbose_name = 'tarea semanal'
+        verbose_name_plural = 'tareas semanales'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['reto', 'semana'], name='tarea_unica_por_reto_y_semana'
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.reto} - semana {self.semana}'

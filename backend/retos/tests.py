@@ -1,10 +1,14 @@
-from datetime import date
+from datetime import date, timedelta
 
+from django.test import override_settings
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from .models import Reto
+from .models import Reto, TareaSemanal
+
+HOY = timezone.localdate()
 
 
 class RetoApiTests(APITestCase):
@@ -32,3 +36,27 @@ class RetoApiTests(APITestCase):
         respuesta = self.client.post(reverse('avance-list'), datos, format='json')
         self.assertEqual(respuesta.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('porcentaje', respuesta.data)
+
+
+# Hoy se simula como semana 7, sea cual sea la fecha real en que se ejecute la prueba.
+@override_settings(SEMESTRE_INICIO=HOY - timedelta(weeks=6), SEMANA_DESDE=7, SEMANA_HASTA=15)
+class TareaSemanalTests(APITestCase):
+    def test_crear_reto_genera_semanas_7_a_15(self):
+        datos = {'titulo': 'Reto semanal', 'fecha_inicio': str(HOY)}
+        respuesta = self.client.post(reverse('reto-list'), datos, format='json')
+        self.assertEqual(respuesta.status_code, status.HTTP_201_CREATED)
+        semanas = list(
+            TareaSemanal.objects.filter(reto_id=respuesta.data['id'])
+            .values_list('semana', flat=True)
+        )
+        self.assertEqual(semanas, list(range(7, 16)))
+
+    def test_semana_cerrada_no_se_puede_modificar(self):
+        reto = Reto.objects.create(titulo='Cerrado', fecha_inicio=HOY)
+        tarea = TareaSemanal.objects.create(
+            reto=reto, semana=6,
+            fecha_inicio=HOY - timedelta(days=13), fecha_fin=HOY - timedelta(days=7),
+        )
+        url = reverse('tareasemanal-detail', args=[tarea.id])
+        respuesta = self.client.patch(url, {'porcentaje': 100}, format='json')
+        self.assertEqual(respuesta.status_code, status.HTTP_400_BAD_REQUEST)
