@@ -1,0 +1,21 @@
+Found 3 test(s).
+Operations to perform:
+  Synchronize unmigrated apps: corsheaders, django_filters, drf_spectacular, messages, rest_framework, staticfiles
+  Apply all migrations: admin, auth, contenttypes, retos, sessions
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  No migrations to apply.
+System check identified no issues (0 silenced).
+Using existing test database for alias 'default' ('test_seguimiento_retos')...
+
+test_crear_y_listar_reto (retos.tests.RetoApiTests.test_crear_y_listar_reto) ... ok
+test_rechaza_fecha_fin_anterior_a_inicio (retos.tests.RetoApiTests.test_rechaza_fecha_fin_anterior_a_inicio) ... ok
+test_rechaza_porcentaje_mayor_a_100 (retos.tests.RetoApiTests.test_rechaza_porcentaje_mayor_a_100) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.028s
+
+OK
+Preserving test database for alias 'default' ('test_seguimiento_retos')...

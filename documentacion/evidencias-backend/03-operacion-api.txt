@@ -1,0 +1,2 @@
+﻿HTTP 200 GET /api/retos/
+{"count":1,"next":null,"previous":null,"results":[{"id":1,"titulo":"Leer 10 libros","descripcion":"","fecha_inicio":"2026-11-18","fecha_fin":null,"estado":"PENDIENTE","total_avances":1,"creado":"2026-11-18T10:54:04.451722-05:00","actualizado":"2026-11-18T10:54:04.451722-05:00"}]}

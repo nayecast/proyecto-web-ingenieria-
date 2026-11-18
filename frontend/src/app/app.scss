@@ -1,0 +1,32 @@
+main {
+  max-width: 48rem;
+  margin-inline: auto;
+}
+
+form {
+  display: grid;
+  gap: .75rem;
+  padding-block: .75rem;
+  max-width: 28rem;
+}
+
+label {
+  display: grid;
+  gap: .25rem;
+  white-space: normal;
+}
+
+input,
+textarea,
+button {
+  padding: .5rem;
+}
+
+button {
+  border: 1px solid currentColor;
+  border-radius: .25rem;
+}
+
+summary {
+  cursor: pointer;
+}
