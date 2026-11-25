@@ -1,8 +1,40 @@
-import { calcularSemaforo, diasEntre, evaluarSemana } from './semaforo';
+import { calcularRachas, calcularSemaforo, diasEntre, evaluarSemana, SemanaEvaluada } from './semaforo';
 import { TareaSemanal } from './modelos';
 
 const INICIO = '2026-11-16'; // lunes semana 7
 const FIN = '2026-11-22'; // domingo semana 7
+
+describe('calcularRachas', () => {
+  function semana(numero: number, porcentaje: number, semaforo: SemanaEvaluada['semaforo']): SemanaEvaluada {
+    return {
+      id: numero, reto: 1, reto_titulo: 'Leer', semana: numero, fecha_inicio: INICIO,
+      fecha_fin: FIN, descripcion: '', actualizado: '', porcentaje, semaforo,
+      cerrada: semaforo !== 'PENDIENTE' && semaforo !== 'ABIERTA',
+      editable: semaforo === 'ABIERTA', diasRestantes: 0, enRiesgo: false,
+    };
+  }
+
+  it('mantiene la racha mientras la semana actual sigue en curso y excluye las futuras', () => {
+    expect(calcularRachas([
+      semana(9, 100, 'PENDIENTE'), semana(8, 80, 'ABIERTA'), semana(7, 100, 'VERDE'),
+    ])).toEqual({ actual: 1, mejor: 1 });
+  });
+
+  it('extiende la racha al llegar al 100 % y conserva el récord tras un cierre incompleto', () => {
+    expect(calcularRachas([
+      semana(7, 100, 'VERDE'), semana(8, 100, 'ABIERTA'),
+    ])).toEqual({ actual: 2, mejor: 2 });
+    expect(calcularRachas([
+      semana(7, 100, 'VERDE'), semana(8, 100, 'VERDE'), semana(9, 90, 'AMARILLO'),
+    ])).toEqual({ actual: 0, mejor: 2 });
+  });
+
+  it('inicia otra racha si falta una semana intermedia', () => {
+    expect(calcularRachas([
+      semana(7, 100, 'VERDE'), semana(8, 100, 'VERDE'), semana(10, 100, 'ABIERTA'),
+    ])).toEqual({ actual: 1, mejor: 2 });
+  });
+});
 
 describe('calcularSemaforo', () => {
   it('una semana futura queda PENDIENTE', () => {

@@ -120,3 +120,22 @@ export function resumirPorReto(semanas: SemanaEvaluada[]): Map<number, ResumenRe
   }
   return resumen;
 }
+
+/** Cuenta las semanas consecutivas con la meta alcanzada en un mismo reto. */
+export function calcularRachas(semanas: readonly SemanaEvaluada[]): { actual: number; mejor: number } {
+  let actual = 0;
+  let mejor = 0;
+  let anterior: number | undefined;
+
+  for (const semana of [...semanas].sort((a, b) => a.semana - b.semana)) {
+    if (semana.semaforo === 'PENDIENTE') break;
+    if (anterior !== undefined && semana.semana !== anterior + 1) actual = 0;
+    if (!semana.cerrada && semana.porcentaje < META) break;
+
+    actual = semana.porcentaje >= META ? actual + 1 : 0;
+    mejor = Math.max(mejor, actual);
+    anterior = semana.semana;
+  }
+
+  return { actual, mejor };
+}
